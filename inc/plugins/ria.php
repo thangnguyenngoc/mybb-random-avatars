@@ -18,7 +18,8 @@ function ria_info()
 		'author'		=> 'Chii, https://github.com/thangnguyenngoc/mybb-random-avatars',
 		'authorsite'	=> 'https://github.com/thangnguyenngoc/mybb-random-avatars',
 		'version'		=> '1.0',
-		'compatibility' => '16*,14*'
+		'compatibility' => '16*,14*',
+        'guid'          => '9995e106bf364b38bb2dd1849770de65'
 	);
 }
 
@@ -35,14 +36,10 @@ function ria_activate()
     $ria_setting_2 = array('name' => 'pofria','title' =>'Position ','description' =>'Where do you want to display Random Index Avatars?','optionscode' => 'select\nheader=Header\nfooter=Footer','value' => 'header','disporder' => 2,'gid' => intval($gid),);
     $ria_setting_3 = array('name' => 'inbria','title' =>'Custom text or banner','description' =>'You can enter text or arbitrary code for displayed in below Random Index Avatars.','optionscode' => 'textarea','value' => '','disporder' => 3,'gid' => intval($gid),);
     $ria_setting_4 = array('name' => 'limitria','title' =>'Number of Users','description' =>'How many users would be displayed?','optionscode' => 'text','value' => '10','disporder' => 4,'gid' => intval($gid),);
-    $ria_setting_5 = array('name' => 'userstyleria','title' =>'Username Style','description' =>'Do you want to display Username Style?','optionscode' => 'yesno','value' => '1','disporder' => 5,'gid' => intval($gid),);
-    $ria_setting_6 = array('name' => 'riaava','title' =>'Display User Avatar','description' =>'Do you want to Display User Avatar?','optionscode' => 'yesno','value' => '0','disporder' => 6,'gid' => intval($gid),);
     $db->insert_query('settings',$ria_setting_1);
     $db->insert_query('settings',$ria_setting_2);
     $db->insert_query('settings',$ria_setting_3);
     $db->insert_query('settings',$ria_setting_4);
-    $db->insert_query('settings',$ria_setting_5);
-    $db->insert_query('settings',$ria_setting_6);
     rebuildsettings();
     $ria_template = array(
 		"title"		=> 'ria',
@@ -51,23 +48,21 @@ function ria_activate()
 <td class="thead" colspan="4" align="center"><strong>{$lang->ria}</strong></td>
 </tr>
 <tr>
+<td class="trow1" width="100%">
 {$feed1_ria}
+</td>
 </tr>
 <tr>
+<td class="trow1" width="100%">
 {$feed2_ria}
-</tr>
-<tr>
-{$feed3_ria}
-</tr>
-<tr>
-{$feed4_ria}
+</td>
 </tr>
 {$banner}
 </table>
 <div style="text-align: right; font-size: 10px;"> Index Avatars by <a href="https://github.com/thangnguyenngoc/mybb-random-avatars" target="blank">Chii</a></div><br />'),
 		"sid"		=> "-1",
 		"version"	=> "1.0",
-		"dateline"	=> "1157735635",
+		"dateline"	=> "1418058000",
 	);
 	$db->insert_query("templates", $ria_template);
     find_replace_templatesets("index", '#{\$boardstats}#', "{\$riaf}\n{\$boardstats}");
@@ -84,8 +79,6 @@ function ria_deactivate()
     $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('pofria', 'ria')");
     $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('inbria', 'ria')");
     $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('limitria', 'ria')");
-    $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('userstyleria', 'ria')");
-    $db->query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('riaava', 'ria')");
     $db->query("DELETE FROM ".TABLE_PREFIX."settinggroups WHERE name='ria'");
     rebuildsettings();
     find_replace_templatesets("index", '#'.preg_quote('{$riaf}').'#', '',0);
@@ -114,15 +107,31 @@ function ria()
             {
                 $user['avatar'] = "./images/default_avatar.gif";
             }
-            if($mybb->settings['userstyleria'] == 1)
-            {
-                $user['username'] = format_name($user['username'], $user['usergroup'], $user['displaygroup']);
-            }
-            $ava = '<img src="'.$user['avatar'].'" 	width="24px" height="24px">';
-            $feed1_ria .= '<a>'.$ava.'</td><td align="left">'.$userlink.'</td></tr>';
-            $feed1_ria .= "<a href=\"{$mybb->settings['bburl']}/".get_profile_link($user['uid'])."\" title=\"{$user['username']}\">{$ava}</a>"
+            $ava = '<img src="'.$user['avatar'].'" 	width="50px" height="50px" style="display:block;">';
+            $profilelink = get_profile_link($user['uid']);
+            $link = "<a href=\"{$mybb->settings['bburl']}/".$profilelink."\" title=\"{$user['username']}\" style=\"display:block;\">{$ava}</a>";
+            $feed1_ria .= "<li style=\"display:inline-block;\">{$link}</li>";
         }
         $feed1_ria .= '</ul>';
+
+        $query = $db->query("SELECT u.uid,u.username,u.displaygroup,u.usergroup,u.avatar FROM ".TABLE_PREFIX."users u WHERE u.avatar<>'' ORDER BY RAND() LIMIT 0,".$mybb->settings['limitria']."");
+        $feed2_ria = '<ul style="list-style-type:none; margin:0px; padding:0px;">';
+        while($user = $db->fetch_array($query))
+        {
+            if($user['avatar'] != '')
+            {
+                $user['avatar'] = $user['avatar'];
+            }
+            else
+            {
+                $user['avatar'] = "./images/default_avatar.gif";
+            }
+            $ava = '<img src="'.$user['avatar'].'"  width="50px" height="50px" style="display:block;">';
+            $profilelink = get_profile_link($user['uid']);
+            $link = "<a href=\"{$mybb->settings['bburl']}/".$profilelink."\" title=\"{$user['username']}\" style=\"display:block;\">{$ava}</a>";
+            $feed1_ria .= "<li style=\"display:inline-block;\">{$link}</li>";
+        }
+        $feed2_ria .= '</ul>';
         
         //check banner
         if($mybb->settings['inbria'] != '')
