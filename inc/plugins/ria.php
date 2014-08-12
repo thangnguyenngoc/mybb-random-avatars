@@ -99,14 +99,6 @@ function ria()
         $feed1_ria = '<ul style="list-style-type:none; margin:0px; padding:0px;">';
         while($user = $db->fetch_array($query))
         {
-            if($user['avatar'] != '')
-            {
-                $user['avatar'] = $user['avatar'];
-            }
-            else
-            {
-                $user['avatar'] = "./images/default_avatar.gif";
-            }
             $ava = '<img src="'.$user['avatar'].'" 	width="50px" height="50px" style="display:block;">';
             $profilelink = get_profile_link($user['uid']);
             $link = "<a href=\"{$mybb->settings['bburl']}/".$profilelink."\" title=\"{$user['username']}\" style=\"display:block;\">{$ava}</a>";
@@ -118,14 +110,6 @@ function ria()
         $feed2_ria = '<ul style="list-style-type:none; margin:0px; padding:0px;">';
         while($user = $db->fetch_array($query))
         {
-            if($user['avatar'] != '')
-            {
-                $user['avatar'] = $user['avatar'];
-            }
-            else
-            {
-                $user['avatar'] = "./images/default_avatar.gif";
-            }
             $ava = '<img src="'.$user['avatar'].'"  width="50px" height="50px" style="display:block;">';
             $profilelink = get_profile_link($user['uid']);
             $link = "<a href=\"{$mybb->settings['bburl']}/".$profilelink."\" title=\"{$user['username']}\" style=\"display:block;\">{$ava}</a>";
