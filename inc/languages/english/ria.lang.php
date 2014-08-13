@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @author Pars (http://MyBBIran.com) 
- * @copyright 2010
+ * @author Chii
+ * @copyright 2014
  * @ En Language
  */
  
